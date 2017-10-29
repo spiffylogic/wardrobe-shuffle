@@ -7,13 +7,26 @@
     android:layout_height="match_parent"
     tools:context="me.spiffylogic.wardrobeshuffle.MainActivity">
 
-    <TextView
+    <Button
+        android:id="@+id/shuffle_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:text="Shuffle!"
+        app:layout_constraintBottom_toTopOf="@id/manage_button"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="spread"/>
+
+    <Button
+        android:id="@+id/manage_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Manage"
+        app:layout_constraintTop_toBottomOf="@id/shuffle_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        />
 
 </android.support.constraint.ConstraintLayout>
