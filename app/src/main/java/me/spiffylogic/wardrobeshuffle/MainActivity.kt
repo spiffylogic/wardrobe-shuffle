@@ -1,10 +1,8 @@
 package me.spiffylogic.wardrobeshuffle
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import android.support.design.widget.Snackbar
-import android.util.Log
 import android.widget.Button
 
 class MainActivity : AppCompatActivity() {
@@ -20,11 +18,9 @@ class MainActivity : AppCompatActivity() {
 
         val shuffleButton = findViewById<Button>(R.id.shuffle_button)
         shuffleButton.setOnClickListener({ view ->
-            Snackbar.make(view, "Tell me what to wear", Snackbar.LENGTH_LONG).show()
+            //Snackbar.make(view, "Tell me what to wear", Snackbar.LENGTH_LONG).show()
+            val intent = Intent(this, ShuffleActivity::class.java)
+            startActivity(intent)
         })
     }
-
-
-
-
 }
