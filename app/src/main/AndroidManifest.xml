@@ -18,6 +18,8 @@
         </activity>
         <activity android:name=".ShuffleActivity">
         </activity>
+        <activity android:name=".ManageActivity">
+        </activity>
     </application>
 
 </manifest>

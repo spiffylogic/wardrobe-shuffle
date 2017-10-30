@@ -13,7 +13,8 @@ class MainActivity : AppCompatActivity() {
 
         val manageButton = findViewById<Button>(R.id.manage_button)
         manageButton.setOnClickListener {
-            Snackbar.make(it, "Go to manage wardrobe (inventory)", Snackbar.LENGTH_LONG).show()
+            val intent = Intent(this, ManageActivity::class.java)
+            startActivity(intent)
         }
 
         val shuffleButton = findViewById<Button>(R.id.shuffle_button)
