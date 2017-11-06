@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val shuffleButton = findViewById<Button>(R.id.shuffle_button)
-        shuffleButton.setOnClickListener({ view ->
+        shuffleButton.setOnClickListener({ _ ->
             //Snackbar.make(view, "Tell me what to wear", Snackbar.LENGTH_LONG).show()
             val intent = Intent(this, ShuffleActivity::class.java)
             startActivity(intent)
