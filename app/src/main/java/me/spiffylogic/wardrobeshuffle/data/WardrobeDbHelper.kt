@@ -5,7 +5,11 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import me.spiffylogic.wardrobeshuffle.R
 import me.spiffylogic.wardrobeshuffle.data.WardrobeContract.WardrobeEntry
+import java.io.ByteArrayOutputStream
 
 class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
 
@@ -29,12 +33,26 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
         onCreate(db)
     }
 
-    fun insertFakeData(): Long {
+    fun insertFakeData(context: Context): Long {
         val values = ContentValues()
         values.put(WardrobeEntry.COLUMN_DESC, "test1")
+        val imageBytes = getSampleImageData(context)
+        values.put(WardrobeEntry.COLUMN_IMAGE, imageBytes)
         val rowId = writableDatabase.insert(WardrobeEntry.TABLE_NAME, null, values)
         assert(rowId != -1L)
         return rowId
+    }
+
+    private fun getSampleImageData(context: Context): ByteArray? {
+        var imageData: Array<Byte>
+        var d = context.resources.getDrawable(R.drawable.sample)
+        if (d is BitmapDrawable) {
+            val b = d.bitmap
+            val os = ByteArrayOutputStream()
+            b.compress(Bitmap.CompressFormat.JPEG, 100, os)
+            return os.toByteArray()
+        }
+        return null
     }
 
     fun getAllItems(): Cursor {

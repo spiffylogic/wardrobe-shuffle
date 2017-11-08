@@ -24,7 +24,7 @@ class ManageActivity : AppCompatActivity() {
         recyclerView.layoutManager = GridLayoutManager(this, 2)
 
         val dbHelper = WardrobeDbHelper(this)
-        dbHelper.insertFakeData()
+        dbHelper.insertFakeData(this)
         val c = dbHelper.getAllItems()
         assert(c.count > 0)
     }
