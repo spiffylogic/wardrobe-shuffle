@@ -1,16 +1,27 @@
 package me.spiffylogic.wardrobeshuffle
 
+import android.database.Cursor
+import android.net.Uri
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
-import org.w3c.dom.Text
+import me.spiffylogic.wardrobeshuffle.data.WardrobeContract
+import java.io.File
 
-class WardrobeAdapter(var items: List<String>) : RecyclerView.Adapter<WardrobeAdapter.ViewHolder>() {
+class WardrobeAdapter(var cursor: Cursor) : RecyclerView.Adapter<WardrobeAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.bind(items[position])
+        if (!cursor.moveToPosition(position)) return
+
+        val desc = cursor.getString(cursor.getColumnIndex(WardrobeContract.WardrobeEntry.COLUMN_DESC))
+        val imagePath = cursor.getString(cursor.getColumnIndex(WardrobeContract.WardrobeEntry.COLUMN_IMAGE))
+
+        holder?.textView?.text = desc
+        if (imagePath != null)
+            holder?.imageView?.setImageURI(Uri.fromFile(File(imagePath)))
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
@@ -19,14 +30,11 @@ class WardrobeAdapter(var items: List<String>) : RecyclerView.Adapter<WardrobeAd
     }
 
     override fun getItemCount(): Int {
-        return items.count()
+        return cursor.count
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         var textView = v.findViewById<TextView>(R.id.sampleTextView)
-
-        fun bind(s: String) {
-            textView.text = s
-        }
+        var imageView = v.findViewById<ImageView>(R.id.imageView)
     }
 }

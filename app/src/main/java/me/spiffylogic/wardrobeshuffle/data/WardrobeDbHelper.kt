@@ -5,11 +5,10 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
-import me.spiffylogic.wardrobeshuffle.R
 import me.spiffylogic.wardrobeshuffle.data.WardrobeContract.WardrobeEntry
-import java.io.ByteArrayOutputStream
+import java.io.FileOutputStream
+
+const val SAMPLE_FILENAME = "sample.jpg"
 
 class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
 
@@ -20,7 +19,7 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
 
     override fun onCreate(db: SQLiteDatabase?) {
         val CREATE_ITEMS_TABLE =
-                String.format("CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s BLOB);",
+                String.format("CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s TEXT);",
                         WardrobeEntry.TABLE_NAME,
                         WardrobeEntry._ID,
                         WardrobeEntry.COLUMN_DESC,
@@ -36,23 +35,32 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
     fun insertFakeData(context: Context): Long {
         val values = ContentValues()
         values.put(WardrobeEntry.COLUMN_DESC, "test1")
-        val imageBytes = getSampleImageData(context)
-        values.put(WardrobeEntry.COLUMN_IMAGE, imageBytes)
+
+        loadSampleAsset(context)
+        val imagePath = context.filesDir.path + "/" + SAMPLE_FILENAME
+        values.put(WardrobeEntry.COLUMN_IMAGE, imagePath)
+
         val rowId = writableDatabase.insert(WardrobeEntry.TABLE_NAME, null, values)
         assert(rowId != -1L)
         return rowId
     }
 
-    private fun getSampleImageData(context: Context): ByteArray? {
-        var imageData: Array<Byte>
-        var d = context.resources.getDrawable(R.drawable.sample)
-        if (d is BitmapDrawable) {
-            val b = d.bitmap
-            val os = ByteArrayOutputStream()
-            b.compress(Bitmap.CompressFormat.JPEG, 100, os)
-            return os.toByteArray()
+    private fun loadSampleAsset(context: Context) {
+        // load it from assets into internal storage
+        val inputStream = context.assets.open(SAMPLE_FILENAME)
+        var bytes = ByteArray(inputStream.available())
+        inputStream.read(bytes)
+        inputStream.close()
+
+        val outputStream: FileOutputStream
+
+        try {
+            outputStream = context.openFileOutput(SAMPLE_FILENAME, Context.MODE_PRIVATE)
+            outputStream.write(bytes)
+            outputStream.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        return null
     }
 
     fun getAllItems(): Cursor {
