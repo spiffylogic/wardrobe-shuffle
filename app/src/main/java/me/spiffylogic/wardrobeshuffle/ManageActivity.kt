@@ -3,6 +3,8 @@ package me.spiffylogic.wardrobeshuffle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
+import android.support.design.widget.Snackbar
 import android.support.v7.widget.GridLayoutManager
 import me.spiffylogic.wardrobeshuffle.data.WardrobeDbHelper
 
@@ -19,5 +21,12 @@ class ManageActivity : AppCompatActivity() {
         dbHelper.insertFakeData(this)
         val c = dbHelper.getAllItems()
         recyclerView.adapter = WardrobeAdapter(c)
+
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
+        fab.setOnClickListener({
+            Snackbar.make(it, "Go to new activity", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null)
+                    .show()
+        })
     }
 }
