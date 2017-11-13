@@ -1,5 +1,6 @@
 package me.spiffylogic.wardrobeshuffle
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.os.Bundle
@@ -24,9 +25,7 @@ class ManageActivity : AppCompatActivity() {
 
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener({
-            Snackbar.make(it, "Go to new activity", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null)
-                    .show()
+            startActivity(Intent(this, AddActivity::class.java))
         })
     }
 }
