@@ -73,15 +73,15 @@ class AddActivity : AppCompatActivity() {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val imageFileName = "JPEG_" + timeStamp + ".jpg"
         val photosDir = File(filesDir, "photos/")
-        val image = File(photosDir, imageFileName)
+        val imageFile = File(photosDir, imageFileName)
 
         // Make sure the containing directory exists!
         // https://stackoverflow.com/a/26386970/432311
-        if (!image.parentFile.exists()) {
-            image.parentFile.mkdirs()
+        if (!imageFile.parentFile.exists()) {
+            imageFile.parentFile.mkdirs()
         }
 
-        Log.d("Markus", "Image file created: " + image.getAbsolutePath())
-        return image
+        Log.d("Markus", "Image file created: " + imageFile.getAbsolutePath())
+        return imageFile
     }
 }
