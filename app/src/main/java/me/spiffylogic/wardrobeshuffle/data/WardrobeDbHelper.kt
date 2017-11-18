@@ -2,16 +2,13 @@ package me.spiffylogic.wardrobeshuffle.data
 
 import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import me.spiffylogic.wardrobeshuffle.data.WardrobeContract.WardrobeEntry
-import java.io.FileOutputStream
 
-const val SAMPLE_FILENAME = "sample.jpg"
+//const val SAMPLE_FILENAME = "sample.jpg"
 
 class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
-
     companion object {
         const val DB_NAME = "wardrobe.db"
         const val DB_VERSION = 1
@@ -32,6 +29,16 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
         onCreate(db)
     }
 
+    fun insertItem(imagePath: String?, desc: String?): Long {
+        val values = ContentValues()
+        values.put(WardrobeEntry.COLUMN_DESC, desc)
+        values.put(WardrobeEntry.COLUMN_IMAGE, imagePath)
+        val rowId = writableDatabase.insert(WardrobeEntry.TABLE_NAME, null, values)
+        assert(rowId != -1L)
+        return rowId
+    }
+
+    /*
     fun insertFakeData(context: Context): Long {
         val values = ContentValues()
         values.put(WardrobeEntry.COLUMN_DESC, "test1")
@@ -62,9 +69,20 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
             e.printStackTrace()
         }
     }
+    */
 
-    fun getAllItems(): Cursor {
-        return writableDatabase.query(WardrobeEntry.TABLE_NAME, null, null, null, null, null, null)
+    fun getAllItems(): ArrayList<WardrobeItem> {
+        val items = ArrayList<WardrobeItem>()
+        val cursor = readableDatabase.query(WardrobeEntry.TABLE_NAME, null, null, null, null, null, null)
+
+        while (cursor.moveToNext()) {
+            val item = WardrobeItem()
+            item.description = cursor.getString(cursor.getColumnIndex(WardrobeEntry.COLUMN_DESC))
+            item.imagePath = cursor.getString(cursor.getColumnIndex(WardrobeEntry.COLUMN_IMAGE)) ?: ""
+            items.add(item)
+        }
+        cursor.close()
+        return items
     }
 
 }

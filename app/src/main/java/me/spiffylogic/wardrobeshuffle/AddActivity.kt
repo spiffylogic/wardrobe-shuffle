@@ -20,6 +20,7 @@ import android.os.Build
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.BitmapFactory
+import me.spiffylogic.wardrobeshuffle.data.WardrobeDbHelper
 
 // Reference: https://developer.android.com/training/camera/photobasics.html
 
@@ -61,6 +62,12 @@ class AddActivity : AppCompatActivity() {
                 startActivityForResult(takePictureIntent, requestNum);
             }
         }
+    }
+
+    fun saveButtonTapped(v: View) {
+        val dbHelper = WardrobeDbHelper(this)
+        dbHelper.insertItem(photoFile?.absolutePath ?: "", "saved description")
+        finish()
     }
 
     // Note: by specifying EXTRA_OUTPUT we told it where to put the data, so data will be null here, hence the ?
