@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
-import android.net.Uri
 import android.support.v4.content.FileProvider
 import android.widget.ImageView
 import android.util.Log
@@ -15,11 +14,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import android.content.pm.PackageManager
-import android.support.media.ExifInterface
 import android.os.Build
-import android.graphics.Bitmap
-import android.graphics.Matrix
-import android.graphics.BitmapFactory
 import me.spiffylogic.wardrobeshuffle.data.WardrobeDbHelper
 
 // Reference: https://developer.android.com/training/camera/photobasics.html
