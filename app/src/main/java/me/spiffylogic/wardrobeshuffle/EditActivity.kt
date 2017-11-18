@@ -16,6 +16,7 @@ import java.util.*
 import android.content.pm.PackageManager
 import android.os.Build
 import me.spiffylogic.wardrobeshuffle.data.WardrobeDbHelper
+import me.spiffylogic.wardrobeshuffle.data.WardrobeItem
 
 // Reference: https://developer.android.com/training/camera/photobasics.html
 
@@ -23,6 +24,8 @@ import me.spiffylogic.wardrobeshuffle.data.WardrobeDbHelper
 // 1) creating a new item
 // 2) editing existing one (e.g. retake photo)
 // 3) deleting an item
+
+const val ITEM_KEY = "ITEM_KEY"
 
 class EditActivity : AppCompatActivity() {
     var photoView: ImageView? = null
@@ -33,6 +36,12 @@ class EditActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
         photoView = findViewById(R.id.photo_view)
+
+        val item = intent.getSerializableExtra(ITEM_KEY) as? WardrobeItem
+        if (item != null) {
+            photoFile = File(item.imagePath)
+            Util.setImageFromFile(photoFile!!, photoView!!)
+        }
     }
 
     fun cameraButtonTapped(v: View) {

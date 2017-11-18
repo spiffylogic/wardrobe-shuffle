@@ -1,7 +1,9 @@
 package me.spiffylogic.wardrobeshuffle
 
+import android.content.Intent
 import android.net.Uri
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,11 +17,7 @@ class WardrobeAdapter : RecyclerView.Adapter<WardrobeAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         val item = items?.get(position)
-        if (item != null && holder != null) {
-            holder.textView?.text = item.description
-            if (item.imagePath != "" && holder.imageView != null)
-                Util.setImageFromFile(File(item.imagePath), holder.imageView)
-        }
+        if (item != null) holder?.bindItem(item)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
@@ -30,7 +28,27 @@ class WardrobeAdapter : RecyclerView.Adapter<WardrobeAdapter.ViewHolder>() {
     override fun getItemCount(): Int = if (items != null) items!!.count() else 0
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-        var textView = v.findViewById<TextView>(R.id.sampleTextView)
-        var imageView = v.findViewById<ImageView>(R.id.imageView)
+        private var textView: TextView
+        private var imageView: ImageView
+        private var wardrobeItem: WardrobeItem? = null
+
+        init {
+            textView = v.findViewById(R.id.sampleTextView)
+            imageView = v.findViewById(R.id.imageView)
+            v.setOnClickListener { v ->
+                if (wardrobeItem != null) {
+                    val editItemIntent = Intent(v.context, EditActivity::class.java)
+                    editItemIntent.putExtra(ITEM_KEY, wardrobeItem)
+                    v.context.startActivity(editItemIntent)
+                }
+            }
+        }
+
+        fun bindItem(item: WardrobeItem) {
+            wardrobeItem = item
+            textView?.text = item.description
+            if (item.imagePath != "" && imageView != null)
+                Util.setImageFromFile(File(item.imagePath), imageView)
+        }
     }
 }

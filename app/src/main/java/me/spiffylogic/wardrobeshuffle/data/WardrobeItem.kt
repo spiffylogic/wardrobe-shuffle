@@ -1,6 +1,8 @@
 package me.spiffylogic.wardrobeshuffle.data
 
-class WardrobeItem {
+import java.io.Serializable
+
+class WardrobeItem : Serializable {
     var description = ""
     var imagePath = ""
 }
