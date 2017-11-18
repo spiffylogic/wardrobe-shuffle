@@ -15,10 +15,10 @@ class WardrobeAdapter : RecyclerView.Adapter<WardrobeAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         val item = items?.get(position)
-        if (item != null) {
-            holder?.textView?.text = item.description
-            if (item.imagePath != "")
-                holder?.imageView?.setImageURI(Uri.fromFile(File(item.imagePath)))
+        if (item != null && holder != null) {
+            holder.textView?.text = item.description
+            if (item.imagePath != "" && holder.imageView != null)
+                Util.setImageFromFile(File(item.imagePath), holder.imageView)
         }
     }
 
