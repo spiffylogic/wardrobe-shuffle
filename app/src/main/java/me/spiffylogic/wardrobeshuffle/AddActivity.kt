@@ -34,7 +34,7 @@ class AddActivity : AppCompatActivity() {
         photoView = findViewById(R.id.photo_view)
     }
 
-    fun dispatchTakePictureIntent(v: View) {
+    fun cameraButtonTapped(v: View) {
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(packageManager) != null) {
             try {
