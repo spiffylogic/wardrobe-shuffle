@@ -25,7 +25,7 @@ class ManageActivity : AppCompatActivity() {
 
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
-            startActivity(Intent(this, AddActivity::class.java))
+            startActivity(Intent(this, EditActivity::class.java))
         }
     }
 

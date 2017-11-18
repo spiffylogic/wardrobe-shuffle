@@ -19,14 +19,19 @@ import me.spiffylogic.wardrobeshuffle.data.WardrobeDbHelper
 
 // Reference: https://developer.android.com/training/camera/photobasics.html
 
-class AddActivity : AppCompatActivity() {
+// This activity should be used for
+// 1) creating a new item
+// 2) editing existing one (e.g. retake photo)
+// 3) deleting an item
+
+class EditActivity : AppCompatActivity() {
     var photoView: ImageView? = null
     var photoFile: File? = null
     var requestNum: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add)
+        setContentView(R.layout.activity_edit)
         photoView = findViewById(R.id.photo_view)
     }
 
