@@ -25,6 +25,9 @@ import me.spiffylogic.wardrobeshuffle.data.WardrobeItem
 // 2) editing existing one (e.g. retake photo)
 // 3) deleting an item
 
+// TODO: don't do SQL on main thread, use Loaders.
+// See https://medium.com/google-developers/making-loading-data-on-android-lifecycle-aware-897e12760832
+
 const val ITEM_KEY = "ITEM_KEY"
 
 class EditActivity : AppCompatActivity() {
