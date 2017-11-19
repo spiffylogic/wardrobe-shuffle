@@ -28,6 +28,8 @@ import me.spiffylogic.wardrobeshuffle.data.WardrobeItem
 const val ITEM_KEY = "ITEM_KEY"
 
 class EditActivity : AppCompatActivity() {
+    // TODO: eliminate the redudancy with how we store this info
+    var wardrobeItem: WardrobeItem? = null
     var photoView: ImageView? = null
     var photoFile: File? = null
     var requestNum: Int = -1
@@ -37,9 +39,9 @@ class EditActivity : AppCompatActivity() {
         setContentView(R.layout.activity_edit)
         photoView = findViewById(R.id.photo_view)
 
-        val item = intent.getSerializableExtra(ITEM_KEY) as? WardrobeItem
-        if (item != null) {
-            photoFile = File(item.imagePath)
+        wardrobeItem = intent.getSerializableExtra(ITEM_KEY) as? WardrobeItem
+        if (wardrobeItem != null && wardrobeItem!!.imagePath != "") {
+            photoFile = File(wardrobeItem!!.imagePath)
             Util.setImageFromFile(photoFile!!, photoView!!)
         }
     }
@@ -76,6 +78,13 @@ class EditActivity : AppCompatActivity() {
     fun saveButtonTapped(v: View) {
         val dbHelper = WardrobeDbHelper(this)
         dbHelper.insertItem(photoFile?.absolutePath ?: "", "saved description")
+        finish()
+    }
+
+    fun deleteButtonTapped(v: View) {
+        val dbHelper = WardrobeDbHelper(this)
+        // TODO: prompt "are you sure?"
+        if (wardrobeItem != null) dbHelper.deleteItem(wardrobeItem!!.id)
         finish()
     }
 

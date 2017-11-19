@@ -29,13 +29,19 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
         onCreate(db)
     }
 
-    fun insertItem(imagePath: String?, desc: String?): Long {
+    fun insertItem(imagePath: String?, desc: String?) {
         val values = ContentValues()
         values.put(WardrobeEntry.COLUMN_DESC, desc)
         values.put(WardrobeEntry.COLUMN_IMAGE, imagePath)
         val rowId = writableDatabase.insert(WardrobeEntry.TABLE_NAME, null, values)
         assert(rowId != -1L)
-        return rowId
+    }
+
+    fun deleteItem(id: Int) {
+        val rowsAffected = writableDatabase.delete(WardrobeEntry.TABLE_NAME,
+                WardrobeEntry._ID + " = ?",
+                arrayOf(id.toString()))
+        assert(rowsAffected == 1)
     }
 
     /*
@@ -77,6 +83,7 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
 
         while (cursor.moveToNext()) {
             val item = WardrobeItem()
+            item.id = cursor.getInt(cursor.getColumnIndex(WardrobeEntry._ID))
             item.description = cursor.getString(cursor.getColumnIndex(WardrobeEntry.COLUMN_DESC))
             item.imagePath = cursor.getString(cursor.getColumnIndex(WardrobeEntry.COLUMN_IMAGE)) ?: ""
             items.add(item)
