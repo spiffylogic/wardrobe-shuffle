@@ -38,7 +38,7 @@ class WardrobeAdapter : RecyclerView.Adapter<WardrobeAdapter.ViewHolder>() {
             v.setOnClickListener { v ->
                 if (wardrobeItem != null) {
                     val editItemIntent = Intent(v.context, EditActivity::class.java)
-                    editItemIntent.putExtra(ITEM_KEY, wardrobeItem)
+                    editItemIntent.putExtra(EditActivity.ITEM_KEY, wardrobeItem)
                     v.context.startActivity(editItemIntent)
                 }
             }
@@ -46,9 +46,11 @@ class WardrobeAdapter : RecyclerView.Adapter<WardrobeAdapter.ViewHolder>() {
 
         fun bindItem(item: WardrobeItem) {
             wardrobeItem = item
-            textView?.text = item.description
-            if (item.imagePath != "" && imageView != null)
+            textView.text = item.description
+            if (item.imagePath != "")
                 Util.setImageFromFile(File(item.imagePath), imageView)
+            else
+                imageView.setImageDrawable(null) // clear any previous image from recycled view
         }
     }
 }

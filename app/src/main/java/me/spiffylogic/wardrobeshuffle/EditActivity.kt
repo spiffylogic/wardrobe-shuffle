@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.content.pm.PackageManager
 import android.os.Build
+import android.widget.EditText
 import me.spiffylogic.wardrobeshuffle.data.WardrobeDbHelper
 import me.spiffylogic.wardrobeshuffle.data.WardrobeItem
 
@@ -28,24 +29,32 @@ import me.spiffylogic.wardrobeshuffle.data.WardrobeItem
 // TODO: don't do SQL on main thread, use Loaders.
 // See https://medium.com/google-developers/making-loading-data-on-android-lifecycle-aware-897e12760832
 
-const val ITEM_KEY = "ITEM_KEY"
-
 class EditActivity : AppCompatActivity() {
-    // TODO: eliminate the redudancy with how we store this info
-    var wardrobeItem: WardrobeItem? = null
-    var photoView: ImageView? = null
-    var photoFile: File? = null
-    var requestNum: Int = -1
+    companion object {
+        val ITEM_KEY = "ITEM_KEY"
+    }
+
+    // TODO: eliminate the redudancy with how we store these pieces of info
+    private var wardrobeItem: WardrobeItem? = null
+    private var editText: EditText? = null
+    private var photoView: ImageView? = null
+    private var photoFile: File? = null
+    private var requestNum: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
         photoView = findViewById(R.id.photo_view)
+        editText = findViewById(R.id.desc_text)
 
         wardrobeItem = intent.getSerializableExtra(ITEM_KEY) as? WardrobeItem
-        if (wardrobeItem != null && wardrobeItem!!.imagePath != "") {
-            photoFile = File(wardrobeItem!!.imagePath)
-            Util.setImageFromFile(photoFile!!, photoView!!)
+        val it = wardrobeItem
+        if (it != null) {
+            if (it.imagePath != "") {
+                photoFile = File(it.imagePath)
+                Util.setImageFromFile(photoFile!!, photoView!!)
+            }
+            editText?.setText(it.description)
         }
     }
 
@@ -80,7 +89,11 @@ class EditActivity : AppCompatActivity() {
 
     fun saveButtonTapped(v: View) {
         val dbHelper = WardrobeDbHelper(this)
-        dbHelper.insertItem(photoFile?.absolutePath ?: "", "saved description")
+        val path = photoFile?.absolutePath ?: ""
+        val desc = editText?.text.toString()
+        val it = wardrobeItem
+        if (it == null) dbHelper.insertItem(path, desc)
+        else dbHelper.updateItem(it.id, path, desc)
         finish()
     }
 

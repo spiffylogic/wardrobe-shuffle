@@ -37,9 +37,17 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
         assert(rowId != -1L)
     }
 
+    fun updateItem(id: Int, imagePath: String?, desc: String?) {
+        val values = ContentValues()
+        values.put(WardrobeEntry.COLUMN_DESC, desc)
+        values.put(WardrobeEntry.COLUMN_IMAGE, imagePath)
+        val rowsAffected = writableDatabase.update(WardrobeEntry.TABLE_NAME, values, WardrobeEntry._ID + "=?", arrayOf(id.toString()))
+        assert(rowsAffected == 1)
+    }
+
     fun deleteItem(id: Int) {
         val rowsAffected = writableDatabase.delete(WardrobeEntry.TABLE_NAME,
-                WardrobeEntry._ID + " = ?",
+                WardrobeEntry._ID + "=?",
                 arrayOf(id.toString()))
         assert(rowsAffected == 1)
     }
