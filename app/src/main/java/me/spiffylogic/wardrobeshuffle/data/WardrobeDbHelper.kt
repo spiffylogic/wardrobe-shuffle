@@ -4,7 +4,9 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import me.spiffylogic.wardrobeshuffle.data.WardrobeContract.WardrobeEntry
+import java.util.*
 
 //const val SAMPLE_FILENAME = "sample.jpg"
 
@@ -85,6 +87,19 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
     }
     */
 
+    fun getItem(id: Int): WardrobeItem? {
+        var cursor = readableDatabase.query(WardrobeEntry.TABLE_NAME, null, "_id=?", arrayOf(id.toString()), null, null, null)
+        if (!cursor.moveToNext()) return null
+
+        val item = WardrobeItem()
+        item.id = cursor.getInt(cursor.getColumnIndex(WardrobeEntry._ID))
+        item.description = cursor.getString(cursor.getColumnIndex(WardrobeEntry.COLUMN_DESC))
+        item.imagePath = cursor.getString(cursor.getColumnIndex(WardrobeEntry.COLUMN_IMAGE)) ?: ""
+
+        cursor.close()
+        return item
+    }
+
     fun getAllItems(): ArrayList<WardrobeItem> {
         val items = ArrayList<WardrobeItem>()
         val cursor = readableDatabase.query(WardrobeEntry.TABLE_NAME, null, null, null, null, null, null)
@@ -100,4 +115,20 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
         return items
     }
 
+    fun getRandomItem(): WardrobeItem {
+        val cursor = readableDatabase.query(WardrobeEntry.TABLE_NAME, null, null, null, null, null, null)
+        val n = cursor.count
+        val p = Random().nextInt(n) // 0 <= p < n
+        assert(cursor.moveToPosition(p)) // zero-based position
+
+        val item = WardrobeItem()
+        item.id = cursor.getInt(cursor.getColumnIndex(WardrobeEntry._ID))
+        item.description = cursor.getString(cursor.getColumnIndex(WardrobeEntry.COLUMN_DESC))
+        item.imagePath = cursor.getString(cursor.getColumnIndex(WardrobeEntry.COLUMN_IMAGE)) ?: ""
+        cursor.close()
+
+        Log.d("Markus", String.format("Randomly chose ID %d at position %d", item.id, p))
+
+        return item
+    }
 }
