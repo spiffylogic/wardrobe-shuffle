@@ -23,7 +23,10 @@ class ShuffleActivity : AppCompatActivity() {
         val dbHelper = dbHelper
         dbHelper?.let {
             val item = dbHelper.getRandomItem()
-            Util.setImageFromFile(File(item.imagePath), image_view)
+            if (item.imagePath == "")
+                image_view.setImageDrawable(null)
+            else
+                Util.setImageFromFile(File(item.imagePath), image_view)
         }
     }
 
