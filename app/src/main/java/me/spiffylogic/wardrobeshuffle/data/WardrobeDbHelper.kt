@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import me.spiffylogic.wardrobeshuffle.data.WardrobeContract.WardrobeEntry
+import me.spiffylogic.wardrobeshuffle.data.WardrobeContract.WornEntry
 import java.util.*
 
 //const val SAMPLE_FILENAME = "sample.jpg"
@@ -23,11 +24,24 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
                         WardrobeEntry._ID,
                         WardrobeEntry.COLUMN_DESC,
                         WardrobeEntry.COLUMN_IMAGE)
+        val CREATE_WORN_TABLE =
+                String.format("CREATE TABLE %s (%s INTEGER PRIMARY KEY, " +
+                        "%s INTEGER NOT NULL, %s DATE NOT NULL, " +
+                        "FOREIGN KEY (%s) REFERENCES %s (%s));",
+                        WornEntry.TABLE_NAME,
+                        WornEntry._ID,
+                        WornEntry.COLUMN_ITEM_KEY,
+                        WornEntry.COLUMN_DATE,
+                        WornEntry.COLUMN_ITEM_KEY,
+                        WardrobeEntry.TABLE_NAME,
+                        WardrobeEntry._ID)
         db?.execSQL(CREATE_ITEMS_TABLE)
+        db?.execSQL(CREATE_WORN_TABLE)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         db?.execSQL(String.format("DROP TABLE IF EXISTS %s", WardrobeEntry.TABLE_NAME))
+        db?.execSQL(String.format("DROP TABLE IF EXISTS %s", WornEntry.TABLE_NAME))
         onCreate(db)
     }
 
