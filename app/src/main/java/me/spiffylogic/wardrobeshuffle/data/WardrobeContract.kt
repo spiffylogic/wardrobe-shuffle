@@ -11,11 +11,10 @@ class WardrobeContract {
             val COLUMN_IMAGE = "image"
         }
     }
-    class WornEntry {
+    class HistoryEntry {
         companion object {
-            val TABLE_NAME = "worn"
-            val _ID = BaseColumns._ID
-            val COLUMN_ITEM_KEY = "items_id"
+            val TABLE_NAME = "history"
+            val COLUMN_ITEM_KEY = "item_id"
             val COLUMN_DATE = "date"
         }
     }

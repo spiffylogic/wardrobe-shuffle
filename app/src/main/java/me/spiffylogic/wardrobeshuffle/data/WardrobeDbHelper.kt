@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import me.spiffylogic.wardrobeshuffle.data.WardrobeContract.WardrobeEntry
-import me.spiffylogic.wardrobeshuffle.data.WardrobeContract.WornEntry
+import me.spiffylogic.wardrobeshuffle.data.WardrobeContract.HistoryEntry
 import java.util.*
 
 //const val SAMPLE_FILENAME = "sample.jpg"
@@ -24,24 +24,26 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
                         WardrobeEntry._ID,
                         WardrobeEntry.COLUMN_DESC,
                         WardrobeEntry.COLUMN_IMAGE)
-        val CREATE_WORN_TABLE =
-                String.format("CREATE TABLE %s (%s INTEGER PRIMARY KEY, " +
+        val CREATE_HISTORY_TABLE =
+                String.format("CREATE TABLE %s (" +
                         "%s INTEGER NOT NULL, %s DATE NOT NULL, " +
+                        "UNIQUE (%s, %s) ON CONFLICT ABORT, " +
                         "FOREIGN KEY (%s) REFERENCES %s (%s));",
-                        WornEntry.TABLE_NAME,
-                        WornEntry._ID,
-                        WornEntry.COLUMN_ITEM_KEY,
-                        WornEntry.COLUMN_DATE,
-                        WornEntry.COLUMN_ITEM_KEY,
+                        HistoryEntry.TABLE_NAME,
+                        HistoryEntry.COLUMN_ITEM_KEY,
+                        HistoryEntry.COLUMN_DATE,
+                        HistoryEntry.COLUMN_ITEM_KEY,
+                        HistoryEntry.COLUMN_DATE,
+                        HistoryEntry.COLUMN_ITEM_KEY,
                         WardrobeEntry.TABLE_NAME,
                         WardrobeEntry._ID)
         db?.execSQL(CREATE_ITEMS_TABLE)
-        db?.execSQL(CREATE_WORN_TABLE)
+        db?.execSQL(CREATE_HISTORY_TABLE)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         db?.execSQL(String.format("DROP TABLE IF EXISTS %s", WardrobeEntry.TABLE_NAME))
-        db?.execSQL(String.format("DROP TABLE IF EXISTS %s", WornEntry.TABLE_NAME))
+        db?.execSQL(String.format("DROP TABLE IF EXISTS %s", HistoryEntry.TABLE_NAME))
         onCreate(db)
     }
 
@@ -144,5 +146,12 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
         Log.d("Markus", String.format("Randomly chose ID %d at position %d", item.id, p))
 
         return item
+    }
+
+    // record that existing wardrobe item was worn today
+    fun recordHistory(id: Int) {
+        // info: https://stackoverflow.com/a/4330694/432311
+        writableDatabase.execSQL(String.format("INSERT OR REPLACE INTO %s (%s, %s) VALUES (%d, date('now'));",
+                HistoryEntry.TABLE_NAME, HistoryEntry.COLUMN_ITEM_KEY, HistoryEntry.COLUMN_DATE, id))
     }
 }
