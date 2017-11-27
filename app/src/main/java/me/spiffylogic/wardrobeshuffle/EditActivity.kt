@@ -108,8 +108,14 @@ class EditActivity : AppCompatActivity() {
     // TODO: Since it seems we need to work with the bitmap directly anyway, consider skipping the fileprovider stuff
     // and just write the file after we've done everything with the bitmap
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == requestNum && resultCode == Activity.RESULT_OK && photoFile != null && photoView != null) {
-            Util.setImageFromFile(photoFile!!, photoView!!)
+        if (requestCode == requestNum) {
+            if (resultCode == Activity.RESULT_OK && photoFile != null && photoView != null) {
+                Util.setImageFromFile(photoFile!!, photoView!!)
+            } else if (resultCode == Activity.RESULT_CANCELED && photoFile != null) {
+                // clean up that file we created
+                photoFile!!.delete()
+                photoFile = null
+            }
         }
     }
 

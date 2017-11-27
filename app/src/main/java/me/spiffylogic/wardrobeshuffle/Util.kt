@@ -9,12 +9,19 @@ import android.support.v4.content.FileProvider
 import android.util.Log
 import android.widget.ImageView
 import java.io.File
+import java.io.FileNotFoundException
 
 class Util {
     companion object {
         fun setImageFromFile(imageFile: File, imageView: ImageView) {
             // Note: be sure to use the support version (android.support.media.ExifInterface)
-            val ei = ExifInterface(imageFile.path)
+            val ei: ExifInterface
+            try {
+                ei = ExifInterface(imageFile.path)
+            } catch (ex: FileNotFoundException) {
+                ex.printStackTrace()
+                return
+            }
             val orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
             Log.d("Markus", String.format("orientation: %s", orientation))
 
