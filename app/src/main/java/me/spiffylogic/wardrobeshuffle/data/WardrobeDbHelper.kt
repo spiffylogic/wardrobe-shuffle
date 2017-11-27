@@ -131,6 +131,7 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
         return items
     }
 
+    // FIXME: this crashes on empty database
     fun getRandomItem(): WardrobeItem {
         val cursor = readableDatabase.query(WardrobeEntry.TABLE_NAME, null, null, null, null, null, null)
         val n = cursor.count
