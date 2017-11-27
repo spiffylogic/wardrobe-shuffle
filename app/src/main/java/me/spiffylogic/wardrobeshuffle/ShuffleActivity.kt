@@ -18,6 +18,11 @@ class ShuffleActivity : AppCompatActivity() {
         shuffle()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        dbHelper?.close()
+    }
+
     fun shuffle() {
         // Pick a random item from the database
         val dbHelper = dbHelper

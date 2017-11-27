@@ -36,4 +36,9 @@ class ManageActivity : AppCompatActivity() {
             wardrobeAdapter.notifyDataSetChanged()
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        dbHelper?.close()
+    }
 }
