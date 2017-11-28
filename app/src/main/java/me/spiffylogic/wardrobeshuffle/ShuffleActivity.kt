@@ -42,11 +42,15 @@ class ShuffleActivity : AppCompatActivity() {
         // we're wearing this today - update the database accordingly
         val dbHelper = dbHelper
         val i = item
-        if (dbHelper != null && i != null) dbHelper.recordHistory(i.id)
+        if (dbHelper != null && i != null) dbHelper.recordHistory(i.id, true)
         finish()
     }
 
     fun noButtonTapped(v: View) {
-        shuffle() // try another
+        // skip this item and try another
+        val dbHelper = dbHelper
+        val i = item
+        if (dbHelper != null && i != null) dbHelper.recordHistory(i.id, false)
+        shuffle()
     }
 }

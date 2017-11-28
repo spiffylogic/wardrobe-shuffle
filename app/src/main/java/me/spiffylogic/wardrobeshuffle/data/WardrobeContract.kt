@@ -16,6 +16,7 @@ class WardrobeContract {
             val TABLE_NAME = "history"
             val COLUMN_ITEM_KEY = "item_id"
             val COLUMN_DATE = "date"
+            val COLUMN_WORN = "worn" // 1 = worn, 0 = skipped
         }
     }
 }

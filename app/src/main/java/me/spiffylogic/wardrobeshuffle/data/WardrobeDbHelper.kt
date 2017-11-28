@@ -26,12 +26,13 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
                         WardrobeEntry.COLUMN_IMAGE)
         val CREATE_HISTORY_TABLE =
                 String.format("CREATE TABLE %s (" +
-                        "%s INTEGER NOT NULL, %s DATE NOT NULL, " +
+                        "%s INTEGER NOT NULL, %s DATE NOT NULL, %s INTEGER NOT NULL, " +
                         "UNIQUE (%s, %s) ON CONFLICT ABORT, " +
-                        "FOREIGN KEY (%s) REFERENCES %s (%s));",
+                        "FOREIGN KEY (%s) REFERENCES %s (%s) ON DELETE CASCADE);",
                         HistoryEntry.TABLE_NAME,
                         HistoryEntry.COLUMN_ITEM_KEY,
                         HistoryEntry.COLUMN_DATE,
+                        HistoryEntry.COLUMN_WORN,
                         HistoryEntry.COLUMN_ITEM_KEY,
                         HistoryEntry.COLUMN_DATE,
                         HistoryEntry.COLUMN_ITEM_KEY,
@@ -39,6 +40,11 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
                         WardrobeEntry._ID)
         db?.execSQL(CREATE_ITEMS_TABLE)
         db?.execSQL(CREATE_HISTORY_TABLE)
+    }
+
+    override fun onOpen(db: SQLiteDatabase?) {
+        super.onOpen(db)
+        db?.execSQL("PRAGMA foreign_keys=ON") // foreign keys disabled by default
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -149,10 +155,11 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
         return item
     }
 
-    // record that existing wardrobe item was worn today
-    fun recordHistory(id: Int) {
-        // info: https://stackoverflow.com/a/4330694/432311
-        writableDatabase.execSQL(String.format("INSERT OR REPLACE INTO %s (%s, %s) VALUES (%d, date('now'));",
-                HistoryEntry.TABLE_NAME, HistoryEntry.COLUMN_ITEM_KEY, HistoryEntry.COLUMN_DATE, id))
+    // record that existing wardrobe item was worn or skipped today
+    fun recordHistory(id: Int, worn: Boolean) {
+        fun Boolean.toInt() = if (this) 1 else 0 // let's do it this way for fun
+        val sql = String.format("INSERT OR REPLACE INTO %s (%s, %s, %s) VALUES (%d, date('now'), %d);",
+                HistoryEntry.TABLE_NAME, HistoryEntry.COLUMN_ITEM_KEY, HistoryEntry.COLUMN_DATE, HistoryEntry.COLUMN_WORN, id, worn.toInt())
+        writableDatabase.execSQL(sql) // more info: https://stackoverflow.com/a/4330694/432311
     }
 }
