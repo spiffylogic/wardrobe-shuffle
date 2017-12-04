@@ -2,14 +2,12 @@ package me.spiffylogic.wardrobeshuffle
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.RecyclerView
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
 import android.support.v7.widget.GridLayoutManager
+import kotlinx.android.synthetic.main.activity_manage.*
 import me.spiffylogic.wardrobeshuffle.data.WardrobeDbHelper
 
 class ManageActivity : AppCompatActivity() {
-    private var recyclerView: RecyclerView? = null
     private var wardrobeAdapter = WardrobeAdapter()
     private var dbHelper: WardrobeDbHelper? = null
 
@@ -19,11 +17,9 @@ class ManageActivity : AppCompatActivity() {
 
         dbHelper = WardrobeDbHelper(this)
 
-        recyclerView = findViewById(R.id.recycler_view)
-        recyclerView?.layoutManager = GridLayoutManager(this, 2)
-        recyclerView?.adapter = wardrobeAdapter
+        recycler_view?.layoutManager = GridLayoutManager(this, 2)
+        recycler_view?.adapter = wardrobeAdapter
 
-        val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
             startActivity(Intent(this, EditActivity::class.java))
         }

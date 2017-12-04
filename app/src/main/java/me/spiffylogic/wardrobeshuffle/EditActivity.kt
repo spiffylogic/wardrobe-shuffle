@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import android.support.v4.content.FileProvider
-import android.widget.ImageView
 import android.util.Log
 import java.io.File
 import java.io.IOException
@@ -18,7 +17,6 @@ import android.os.Build
 import android.widget.EditText
 import kotlinx.android.synthetic.main.activity_edit.*
 import me.spiffylogic.wardrobeshuffle.data.WardrobeDbHelper
-import me.spiffylogic.wardrobeshuffle.data.WardrobeItem
 
 // Reference: https://developer.android.com/training/camera/photobasics.html
 
@@ -38,15 +36,12 @@ class EditActivity : AppCompatActivity() {
     // TODO: eliminate the redudancy with how we store these pieces of info
     private var itemId = -1
     private var editText: EditText? = null
-    private var photoView: ImageView? = null
     private var photoFile: File? = null
     private var requestNum: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
-        photoView = findViewById(R.id.photo_view)
-        editText = findViewById(R.id.desc_text)
 
         itemId = intent.getIntExtra(ITEM_KEY, -1)
 
@@ -57,9 +52,9 @@ class EditActivity : AppCompatActivity() {
         if (item != null) {
             if (item.imagePath != "") {
                 photoFile = File(item.imagePath)
-                Util.setImageFromFile(photoFile!!, photoView!!)
+                Util.setImageFromFile(photoFile!!, photo_view)
             }
-            editText?.setText(item.description)
+            desc_text.setText(item.description)
 
             // https://stackoverflow.com/a/5270292/432311
             val date = dbHelper.getLastWornDate(itemId)
@@ -106,7 +101,7 @@ class EditActivity : AppCompatActivity() {
     fun saveButtonTapped(v: View) {
         val dbHelper = WardrobeDbHelper(this)
         val path = photoFile?.absolutePath ?: ""
-        val desc = editText?.text.toString()
+        val desc = desc_text.text.toString()
         if (itemId < 0) dbHelper.insertItem(path, desc)
         else dbHelper.updateItem(itemId, path, desc)
         finish()
@@ -124,8 +119,8 @@ class EditActivity : AppCompatActivity() {
     // and just write the file after we've done everything with the bitmap
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == requestNum) {
-            if (resultCode == Activity.RESULT_OK && photoFile != null && photoView != null) {
-                Util.setImageFromFile(photoFile!!, photoView!!)
+            if (resultCode == Activity.RESULT_OK && photoFile != null && photo_view != null) {
+                Util.setImageFromFile(photoFile!!, photo_view)
             } else if (resultCode == Activity.RESULT_CANCELED && photoFile != null) {
                 // clean up that file we created
                 photoFile!!.delete()
