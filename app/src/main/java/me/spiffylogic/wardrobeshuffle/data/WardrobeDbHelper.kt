@@ -111,7 +111,7 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
     */
 
     fun getItem(id: Int): WardrobeItem? {
-        var cursor = readableDatabase.query(WardrobeEntry.TABLE_NAME, null, "_id=?", arrayOf(id.toString()), null, null, null)
+        var cursor = readableDatabase.query(WardrobeEntry.TABLE_NAME, null, WardrobeEntry._ID + "=?", arrayOf(id.toString()), null, null, null)
         if (!cursor.moveToNext()) return null
 
         val item = WardrobeItem()
