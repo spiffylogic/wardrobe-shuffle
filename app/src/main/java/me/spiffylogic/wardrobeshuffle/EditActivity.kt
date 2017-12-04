@@ -16,6 +16,7 @@ import java.util.*
 import android.content.pm.PackageManager
 import android.os.Build
 import android.widget.EditText
+import kotlinx.android.synthetic.main.activity_edit.*
 import me.spiffylogic.wardrobeshuffle.data.WardrobeDbHelper
 import me.spiffylogic.wardrobeshuffle.data.WardrobeItem
 
@@ -35,7 +36,7 @@ class EditActivity : AppCompatActivity() {
     }
 
     // TODO: eliminate the redudancy with how we store these pieces of info
-    private var wardrobeItem: WardrobeItem? = null
+    private var itemId = -1
     private var editText: EditText? = null
     private var photoView: ImageView? = null
     private var photoFile: File? = null
@@ -47,14 +48,29 @@ class EditActivity : AppCompatActivity() {
         photoView = findViewById(R.id.photo_view)
         editText = findViewById(R.id.desc_text)
 
-        wardrobeItem = intent.getSerializableExtra(ITEM_KEY) as? WardrobeItem
-        val it = wardrobeItem
-        if (it != null) {
-            if (it.imagePath != "") {
-                photoFile = File(it.imagePath)
+        itemId = intent.getIntExtra(ITEM_KEY, -1)
+
+        // TODO: move DB access off UI thread
+        // TODO: use db helper singleton
+        val dbHelper = WardrobeDbHelper(this)
+        val item = dbHelper.getItem(itemId)
+        if (item != null) {
+            if (item.imagePath != "") {
+                photoFile = File(item.imagePath)
                 Util.setImageFromFile(photoFile!!, photoView!!)
             }
-            editText?.setText(it.description)
+            editText?.setText(item.description)
+
+            // https://stackoverflow.com/a/5270292/432311
+            val date = dbHelper.getLastWornDate(itemId)
+            date?.let { last_worn_date.text = SimpleDateFormat("EEEE, MMM d").format(date) }
+            // This may be useful later:
+            //val c = Calendar.getInstance(); c.time = date
+            //val dayOfWeek = c.get(Calendar.DAY_OF_WEEK) // day of week as int (Sunday = 1, Monday = 2, etc.)
+        }
+        if (last_worn_date.text.isBlank()) {
+            last_worn_label.visibility = View.GONE
+            last_worn_date.visibility = View.GONE
         }
     }
 
@@ -91,16 +107,15 @@ class EditActivity : AppCompatActivity() {
         val dbHelper = WardrobeDbHelper(this)
         val path = photoFile?.absolutePath ?: ""
         val desc = editText?.text.toString()
-        val it = wardrobeItem
-        if (it == null) dbHelper.insertItem(path, desc)
-        else dbHelper.updateItem(it.id, path, desc)
+        if (itemId < 0) dbHelper.insertItem(path, desc)
+        else dbHelper.updateItem(itemId, path, desc)
         finish()
     }
 
     fun deleteButtonTapped(v: View) {
         val dbHelper = WardrobeDbHelper(this)
         // TODO: prompt "are you sure?"
-        if (wardrobeItem != null) dbHelper.deleteItem(wardrobeItem!!.id)
+        if (itemId >= 0) dbHelper.deleteItem(itemId)
         finish()
     }
 

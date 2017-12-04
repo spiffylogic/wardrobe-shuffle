@@ -36,9 +36,9 @@ class WardrobeAdapter : RecyclerView.Adapter<WardrobeAdapter.ViewHolder>() {
             textView = v.findViewById(R.id.sampleTextView)
             imageView = v.findViewById(R.id.imageView)
             v.setOnClickListener { v ->
-                if (wardrobeItem != null) {
+                wardrobeItem?.let {
                     val editItemIntent = Intent(v.context, EditActivity::class.java)
-                    editItemIntent.putExtra(EditActivity.ITEM_KEY, wardrobeItem)
+                    editItemIntent.putExtra(EditActivity.ITEM_KEY, it.id)
                     v.context.startActivity(editItemIntent)
                 }
             }

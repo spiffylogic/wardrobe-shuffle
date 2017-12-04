@@ -32,11 +32,36 @@
         android:ems="10"
         android:hint="Note"
         android:inputType="text|textShortMessage"
-        app:layout_constraintBottom_toTopOf="@id/camera_button"
+        app:layout_constraintBottom_toTopOf="@id/last_worn_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/photo_view"
         />
+
+    <TextView
+        android:id="@+id/last_worn_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Last worn:"
+        app:layout_constraintBottom_toTopOf="@id/camera_button"
+        app:layout_constraintEnd_toStartOf="@id/last_worn_date"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/desc_text"
+        />
+
+    <TextView
+        android:id="@+id/last_worn_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text=""
+        app:layout_constraintStart_toEndOf="@id/last_worn_label"
+        app:layout_constraintTop_toTopOf="@id/last_worn_label"
+        tools:text="Tuesday, Nov 28"/>
 
     <Button
         android:id="@+id/camera_button"
@@ -49,7 +74,7 @@
         app:layout_constraintBottom_toTopOf="@+id/delete_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/desc_text"/>
+        app:layout_constraintTop_toBottomOf="@id/last_worn_label"/>
 
     <Button
         android:id="@+id/delete_button"

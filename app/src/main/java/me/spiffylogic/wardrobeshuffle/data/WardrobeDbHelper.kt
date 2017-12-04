@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import me.spiffylogic.wardrobeshuffle.data.WardrobeContract.WardrobeEntry
 import me.spiffylogic.wardrobeshuffle.data.WardrobeContract.HistoryEntry
+import java.text.SimpleDateFormat
 import java.util.*
 
 //const val SAMPLE_FILENAME = "sample.jpg"
@@ -158,8 +159,25 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
     // record that existing wardrobe item was worn or skipped today
     fun recordHistory(id: Int, worn: Boolean) {
         fun Boolean.toInt() = if (this) 1 else 0 // let's do it this way for fun
-        val sql = String.format("INSERT OR REPLACE INTO %s (%s, %s, %s) VALUES (%d, date('now'), %d);",
-                HistoryEntry.TABLE_NAME, HistoryEntry.COLUMN_ITEM_KEY, HistoryEntry.COLUMN_DATE, HistoryEntry.COLUMN_WORN, id, worn.toInt())
+        val sql = String.format(
+                "INSERT OR REPLACE INTO %s (%s, %s, %s) VALUES (%d, date('now'), %d);",
+                HistoryEntry.TABLE_NAME,
+                HistoryEntry.COLUMN_ITEM_KEY, HistoryEntry.COLUMN_DATE, HistoryEntry.COLUMN_WORN,
+                id, worn.toInt())
         writableDatabase.execSQL(sql) // more info: https://stackoverflow.com/a/4330694/432311
+    }
+
+    fun getLastWornDate(id: Int): Date? {
+        val cursor = readableDatabase.query(HistoryEntry.TABLE_NAME,
+                null,
+                String.format("%s=? AND %s=1", HistoryEntry.COLUMN_ITEM_KEY, HistoryEntry.COLUMN_WORN),
+                arrayOf(id.toString()),
+                null, null,null)
+        if (cursor.moveToNext()) {
+            val dateStr = cursor.getString(cursor.getColumnIndex(HistoryEntry.COLUMN_DATE))
+            cursor.close()
+            return SimpleDateFormat("yyyy-MM-dd").parse(dateStr)
+        }
+        return null
     }
 }
