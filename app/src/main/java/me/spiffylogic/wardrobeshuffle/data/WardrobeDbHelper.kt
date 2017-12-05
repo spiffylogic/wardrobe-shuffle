@@ -13,6 +13,9 @@ import java.util.*
 //const val SAMPLE_FILENAME = "sample.jpg"
 
 class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
+    // TODO: make singleton, see:
+    // https://medium.com/@BladeCoder/kotlin-singletons-with-argument-194ef06edd9e
+    // https://www.androiddesignpatterns.com/2012/05/correctly-managing-your-sqlite-database.html
     companion object {
         const val DB_NAME = "wardrobe.db"
         const val DB_VERSION = 1

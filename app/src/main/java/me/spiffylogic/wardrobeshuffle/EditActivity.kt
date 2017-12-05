@@ -35,7 +35,7 @@ class EditActivity : AppCompatActivity() {
 
     // TODO: eliminate the redudancy with how we store these pieces of info
     private var itemId = -1
-    private var editText: EditText? = null
+    private val dbHelper: WardrobeDbHelper by lazy { WardrobeDbHelper(this) }
     private var photoFile: File? = null
     private var requestNum: Int = -1
 
@@ -45,14 +45,11 @@ class EditActivity : AppCompatActivity() {
 
         itemId = intent.getIntExtra(ITEM_KEY, -1)
 
-        // TODO: move DB access off UI thread
-        // TODO: use db helper singleton
-        val dbHelper = WardrobeDbHelper(this)
         val item = dbHelper.getItem(itemId)
         if (item != null) {
             if (item.imagePath != "") {
                 photoFile = File(item.imagePath)
-                Util.setImageFromFile(photoFile!!, photo_view)
+                photoFile?.let { Util.setImageFromFile(it, photo_view) }
             }
             desc_text.setText(item.description)
 
@@ -67,6 +64,11 @@ class EditActivity : AppCompatActivity() {
             last_worn_label.visibility = View.GONE
             last_worn_date.visibility = View.GONE
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        dbHelper.close()
     }
 
     fun cameraButtonTapped(v: View) {
@@ -99,7 +101,6 @@ class EditActivity : AppCompatActivity() {
     }
 
     fun saveButtonTapped(v: View) {
-        val dbHelper = WardrobeDbHelper(this)
         val path = photoFile?.absolutePath ?: ""
         val desc = desc_text.text.toString()
         if (itemId < 0) dbHelper.insertItem(path, desc)
@@ -108,9 +109,7 @@ class EditActivity : AppCompatActivity() {
     }
 
     fun deleteButtonTapped(v: View) {
-        val dbHelper = WardrobeDbHelper(this)
-        // TODO: prompt "are you sure?"
-        if (itemId >= 0) dbHelper.deleteItem(itemId)
+        if (itemId >= 0) dbHelper.deleteItem(itemId) // TODO: prompt "are you sure?"
         finish()
     }
 
@@ -119,12 +118,14 @@ class EditActivity : AppCompatActivity() {
     // and just write the file after we've done everything with the bitmap
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == requestNum) {
-            if (resultCode == Activity.RESULT_OK && photoFile != null && photo_view != null) {
-                Util.setImageFromFile(photoFile!!, photo_view)
-            } else if (resultCode == Activity.RESULT_CANCELED && photoFile != null) {
-                // clean up that file we created
-                photoFile!!.delete()
-                photoFile = null
+            photoFile?.let {
+                if (resultCode == Activity.RESULT_OK) {
+                    Util.setImageFromFile(it, photo_view)
+                } else if (resultCode == Activity.RESULT_CANCELED) {
+                    // clean up that file we created
+                    it.delete()
+                    photoFile = null
+                }
             }
         }
     }

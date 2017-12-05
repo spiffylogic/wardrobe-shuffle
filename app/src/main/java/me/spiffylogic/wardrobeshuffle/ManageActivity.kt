@@ -9,13 +9,11 @@ import me.spiffylogic.wardrobeshuffle.data.WardrobeDbHelper
 
 class ManageActivity : AppCompatActivity() {
     private var wardrobeAdapter = WardrobeAdapter()
-    private var dbHelper: WardrobeDbHelper? = null
+    private val dbHelper: WardrobeDbHelper by lazy { WardrobeDbHelper(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manage)
-
-        dbHelper = WardrobeDbHelper(this)
 
         recycler_view?.layoutManager = GridLayoutManager(this, 2)
         recycler_view?.adapter = wardrobeAdapter
@@ -27,14 +25,12 @@ class ManageActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        dbHelper?.let {
-            wardrobeAdapter.items = it.getAllItems()
-            wardrobeAdapter.notifyDataSetChanged()
-        }
+        wardrobeAdapter.items = dbHelper.getAllItems()
+        wardrobeAdapter.notifyDataSetChanged()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        dbHelper?.close()
+        dbHelper.close()
     }
 }
