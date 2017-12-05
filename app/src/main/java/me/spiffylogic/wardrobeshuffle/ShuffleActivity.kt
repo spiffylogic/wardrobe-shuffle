@@ -7,6 +7,8 @@ import kotlinx.android.synthetic.main.activity_shuffle.*
 import me.spiffylogic.wardrobeshuffle.data.WardrobeDbHelper
 import me.spiffylogic.wardrobeshuffle.data.WardrobeItem
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ShuffleActivity : AppCompatActivity() {
     private val dbHelper: WardrobeDbHelper by lazy { WardrobeDbHelper(this) }
@@ -26,12 +28,25 @@ class ShuffleActivity : AppCompatActivity() {
 
     fun shuffle() {
         // Pick a random item from the database
-        val i = dbHelper.getRandomItem()
-        if (i.imagePath == "")
+        val item = dbHelper.getRandomItem()
+        val date = dbHelper.getLastWornDate(item.id)
+        bindItem(item, date)
+    }
+
+    private fun bindItem(item: WardrobeItem, date: Date?) {
+        desc_text.text = item.description
+
+        if (date == null)
+            last_worn_text.visibility = View.GONE
+        else
+            last_worn_text.text = "Last worn " + SimpleDateFormat("EEEE, MMM d").format(date)
+
+        if (item.imagePath == "")
             image_view.setImageDrawable(null)
         else
-            Util.setImageFromFile(File(i.imagePath), image_view)
-        item = i
+            Util.setImageFromFile(File(item.imagePath), image_view)
+
+        this.item = item
     }
 
     fun yesButtonTapped(v: View) {
