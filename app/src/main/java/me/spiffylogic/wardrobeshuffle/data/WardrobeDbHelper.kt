@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.database.sqlite.SQLiteQueryBuilder
 import android.util.Log
 import me.spiffylogic.wardrobeshuffle.data.WardrobeContract.WardrobeEntry
 import me.spiffylogic.wardrobeshuffle.data.WardrobeContract.HistoryEntry
@@ -141,7 +142,46 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
         return items
     }
 
-    // FIXME: this crashes on empty database
+    // This is where the shuffle happens
+    // Basic starting logic: pool of candidates includes everything except what you
+    // wore yesterday and the same day last week. Then choose "oldest" item.
+    fun getShuffleItem(): WardrobeItem? {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+        val cal = Calendar.getInstance()
+        cal.time = Date() // today
+        cal.add(Calendar.WEEK_OF_YEAR, -1) // minus a week
+        val weekAgo = cal.time
+
+        cal.time = Date() // today
+        cal.add(Calendar.DAY_OF_YEAR, -1) // minus a day
+        val yesterday = cal.time
+
+        val builder = SQLiteQueryBuilder()
+        // TODO: clearly, named arguments would be nice here
+        builder.tables = String.format("%s INNER JOIN %s ON %s.%s = %s.%s",
+                WardrobeEntry.TABLE_NAME, HistoryEntry.TABLE_NAME,
+                WardrobeEntry.TABLE_NAME, WardrobeEntry._ID,
+                HistoryEntry.TABLE_NAME, HistoryEntry.COLUMN_ITEM_KEY)
+        // select _id, MAX(history.date) from items inner join history on items._id=history.item_id where worn=1 group by items._id;
+        // We want the latest worn date per item, avoiding dates yesterday and one week ago, and avoiding items already considered today
+        // grouping by ID and ordering by date means the "oldest" item will be at the top
+        val projectionIn = arrayOf(WardrobeEntry._ID, WardrobeEntry.COLUMN_DESC, WardrobeEntry.COLUMN_IMAGE, String.format("MAX(%s)", HistoryEntry.COLUMN_DATE))
+        val selection = "worn = 1 AND date < ? AND date != ? AND NOT EXISTS (SELECT * FROM history WHERE items._id = item_id and worn = 0 and date = date('now'))"
+        val selectionArgs = arrayOf(dateFormat.format(yesterday), dateFormat.format(weekAgo))
+        val cursor = builder.query(readableDatabase, projectionIn, selection, selectionArgs, WardrobeEntry._ID, null, HistoryEntry.COLUMN_DATE, "1")
+
+        if (cursor.moveToNext()) {
+            val item = WardrobeItem()
+            item.id = cursor.getInt(cursor.getColumnIndex(WardrobeEntry._ID))
+            item.description = cursor.getString(cursor.getColumnIndex(WardrobeEntry.COLUMN_DESC))
+            item.imagePath = cursor.getString(cursor.getColumnIndex(WardrobeEntry.COLUMN_IMAGE)) ?: ""
+            cursor.close()
+            return item
+        } else return null
+    }
+
+    /*
+    // note: this crashes on empty database
     fun getRandomItem(): WardrobeItem {
         val cursor = readableDatabase.query(WardrobeEntry.TABLE_NAME, null, null, null, null, null, null)
         val n = cursor.count
@@ -154,14 +194,12 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
         item.imagePath = cursor.getString(cursor.getColumnIndex(WardrobeEntry.COLUMN_IMAGE)) ?: ""
         cursor.close()
 
-        Log.d("Markus", String.format("Randomly chose ID %d at position %d", item.id, p))
-
         return item
-    }
+    }*/
 
     // record that existing wardrobe item was worn or skipped today
     fun recordHistory(id: Int, worn: Boolean) {
-        fun Boolean.toInt() = if (this) 1 else 0 // let's do it this way for fun
+        fun Boolean.toInt() = if (this) 1 else 0 // let's code it this way for fun
         val sql = String.format(
                 "INSERT OR REPLACE INTO %s (%s, %s, %s) VALUES (%d, date('now'), %d);",
                 HistoryEntry.TABLE_NAME,
@@ -175,7 +213,10 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
                 null,
                 String.format("%s=? AND %s=1", HistoryEntry.COLUMN_ITEM_KEY, HistoryEntry.COLUMN_WORN),
                 arrayOf(id.toString()),
-                null, null,null)
+                null,
+                null,
+                HistoryEntry.COLUMN_DATE + " DESC",
+                "1")
         if (cursor.moveToNext()) {
             val dateStr = cursor.getString(cursor.getColumnIndex(HistoryEntry.COLUMN_DATE))
             cursor.close()

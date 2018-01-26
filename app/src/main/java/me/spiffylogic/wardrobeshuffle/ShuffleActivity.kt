@@ -2,7 +2,9 @@ package me.spiffylogic.wardrobeshuffle
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_shuffle.*
 import me.spiffylogic.wardrobeshuffle.data.WardrobeDbHelper
 import me.spiffylogic.wardrobeshuffle.data.WardrobeItem
@@ -27,10 +29,17 @@ class ShuffleActivity : AppCompatActivity() {
     }
 
     fun shuffle() {
-        // Pick a random item from the database
-        val item = dbHelper.getRandomItem()
-        val date = dbHelper.getLastWornDate(item.id)
-        bindItem(item, date)
+        val item = dbHelper.getShuffleItem()
+        if (item != null) {
+            Log.d("Markus", "Shuffle picked item " + item.id)
+            val date = dbHelper.getLastWornDate(item.id)
+            bindItem(item, date)
+        } else {
+            desc_text.text = ""
+            last_worn_text.visibility = View.GONE
+            image_view.setImageDrawable(null)
+            Toast.makeText(this, "Got nothing. Go nude!", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun bindItem(item: WardrobeItem, date: Date?) {
