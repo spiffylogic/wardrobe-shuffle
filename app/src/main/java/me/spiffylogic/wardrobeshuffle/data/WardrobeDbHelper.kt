@@ -158,7 +158,7 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
 
         val builder = SQLiteQueryBuilder()
         // TODO: clearly, named arguments would be nice here
-        builder.tables = String.format("%s INNER JOIN %s ON %s.%s = %s.%s",
+        builder.tables = String.format("%s LEFT JOIN %s ON %s.%s = %s.%s",
                 WardrobeEntry.TABLE_NAME, HistoryEntry.TABLE_NAME,
                 WardrobeEntry.TABLE_NAME, WardrobeEntry._ID,
                 HistoryEntry.TABLE_NAME, HistoryEntry.COLUMN_ITEM_KEY)
@@ -166,7 +166,7 @@ class WardrobeDbHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, nu
         // We want the latest worn date per item, avoiding dates yesterday and one week ago, and avoiding items already considered today
         // grouping by ID and ordering by date means the "oldest" item will be at the top
         val projectionIn = arrayOf(WardrobeEntry._ID, WardrobeEntry.COLUMN_DESC, WardrobeEntry.COLUMN_IMAGE, String.format("MAX(%s)", HistoryEntry.COLUMN_DATE))
-        val selection = "worn = 1 AND date < ? AND date != ? AND NOT EXISTS (SELECT * FROM history WHERE items._id = item_id and worn = 0 and date = date('now'))"
+        val selection = "(worn IS NULL OR worn = 1) AND (date IS NULL OR date < ? AND date != ?) AND NOT EXISTS (SELECT * FROM history WHERE items._id = item_id and worn = 0 and date = date('now'))"
         val selectionArgs = arrayOf(dateFormat.format(yesterday), dateFormat.format(weekAgo))
         val cursor = builder.query(readableDatabase, projectionIn, selection, selectionArgs, WardrobeEntry._ID, null, HistoryEntry.COLUMN_DATE, "1")
 
